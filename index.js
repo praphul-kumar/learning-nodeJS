@@ -1,23 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-
-const replaceTemplate = (template, product) => {
-    // console.log(product.productName);
-    let output = template.replace(/{%PRODUCT_NAME%}/g, product.productName);
-    output = output.replace(/{%PRODUCT_ID%}/g, product.id);
-    output = output.replace(/{%PRODUCT_IMAGE%}/g, product.image);
-    output = output.replace(/{%PRODUCT_FROM%}/g, product.from);
-    output = output.replace(/{%PRODUCT_NUTRIENTS%}/g, product.nutrients);
-    output = output.replace(/{%PRODUCT_QUANTITY%}/g, product.quantity);
-    output = output.replace(/{%PRODUCT_PRICE%}/g, product.price);
-    output = output.replace(/{%PRODUCT_DESCRIPTION%}/g, product.description);
-    
-    if (!product.oranic) output = output.replace(/{%NOT_ORGANIC%}/g, "not-organic");
-
-    // console.log(output);
-    return output;
-}
+const { replaceTemplate } = require('./modules/replaceTemplate');
 
 const replaceOverviewTemplate = (template, products) => {
     let output = template.replace(/{%PRODUCT_CARDS%}/g, products);
@@ -38,22 +22,31 @@ const dataObj = JSON.parse(jsonData);
 
 const server = http.createServer((req, res) => {
 
-    const uriPath = req.url;
-    console.log(uriPath);
+    console.log(url.parse(req.url));
+    const { query, pathname } = url.parse(req.url, true);
+    // const uriPath = req.url;
+    console.log(pathname);
 
-    if (uriPath === '/' || uriPath === '/overview') {
+    if (pathname === '/' || pathname === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html' });
-
+        
         const cardHtml = dataObj.map(el =>replaceTemplate(productCard, el)).join('');
-
+        
         const tempOverview = replaceOverviewTemplate(templateOverview, cardHtml);
-
+        
         res.end(tempOverview);
+        
+    } else if (pathname === "/product") {
+        res.writeHead(200, { 'Content-type': 'text/html' });
+        console.log("Query: ", query);
+        const product = dataObj[query.id];
 
-    } else if (uriPath === "/product") {
-        res.end("This is PRODUCT");
+        console.log(product);
+        const output = replaceTemplate(templateProduct, product);
+        
+        res.end(output);
 
-    } else if (uriPath === '/api') {
+    } else if (pathname === '/api') {
         res.writeHead(200, { 'Content-type': 'application/json' });
         res.end(jsonData);
 
