@@ -35,7 +35,8 @@ server.on('request', (req, res) => {
   // Listening to errors occured during reading stream
   readable.on('error', error => {
     console.log(error)
-    res.status(410).end('File not FOund');
+    res.statusCode = 410;
+    res.end('File not FOund');
   });
 });
 
