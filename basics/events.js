@@ -13,6 +13,14 @@ myEmitter.on('newSale', () => {
   console.log('Customer name: John');
 });
 
+// We can also listen for an event that have some payload with that like below
+myEmitter.on('newSale', stock => {
+  console.log(`There is only ${stock} items left in the Stock.`);
+})
+
 
 // Emitting new event "newSale" by using emit method on EventEmitter Object
-myEmitter.emit("newSale");
+// myEmitter.emit("newSale");
+
+// We can also pass an argument while emitting an event
+myEmitter.emit("newSale", 10);
