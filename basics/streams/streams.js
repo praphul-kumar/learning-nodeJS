@@ -16,28 +16,32 @@ server.on('request', (req, res) => {
 
   // * Solution 02: using Streams
 
-  // Creating Readable stream.
-  const readable = fs.createReadStream('./test-file.txt', 'utf-8');
+  // // Creating Readable stream.
+  // const readable = fs.createReadStream('./test-file.txt', 'utf-8');
 
-  // Attaching listener on readable for data
-  readable.on('data', chunk => {
+  // // Attaching listener on readable for data
+  // readable.on('data', chunk => {
 
-    // writing data into response writable stream
-    res.write(chunk);
-  });
+  //   // writing data into response writable stream
+  //   res.write(chunk);
+  // });
 
-  // listening for readable stream to end 
-  readable.on('end', () => {
-    // Closing writable stream when readable stream ends
-    res.end();
-  });
+  // // listening for readable stream to end 
+  // readable.on('end', () => {
+  //   // Closing writable stream when readable stream ends
+  //   res.end();
+  // });
 
-  // Listening to errors occured during reading stream
-  readable.on('error', error => {
-    console.log(error)
-    res.statusCode = 410;
-    res.end('File not FOund');
-  });
+  // // Listening to errors occured during reading stream
+  // readable.on('error', error => {
+  //   console.log(error)
+  //   res.statusCode = 410;
+  //   res.end('File not FOund');
+  // });
+
+  // * Solution 03: Pipe to solve back pressure (reading fast but not writing as fast as reading)
+  const readable  = fs.createReadStream('test-file.txt');
+  readable.pipe(res);
 });
 
 server.listen(5000, '127.0.0.1', () => {
